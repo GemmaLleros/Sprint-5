@@ -2,7 +2,7 @@
 interface JokeResponse {
     joke: string;
 }
-// 2. Se define una función asíncrona llamada que llama a una API de chistes para obtener un chiste aleatorio y mostrarlo en la página web.
+// 2. Se define una función asíncrona que llama a una API de chistes para obtener un chiste aleatorio y mostrarlo en la página web.
 async function callRandomJoke() {
 // 2.1 Se establece la URL de la API.    
     const API_URL = 'https://icanhazdadjoke.com/';
