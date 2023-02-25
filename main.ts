@@ -1,39 +1,102 @@
-// 1. Se define una interface llamada "JokeResponse" con la propiedad llamada "joke". Esta interface describe el formato de la respuesta.
-interface JokeResponse {
-  id: string;
-  joke: string;
-  status: number;
-}
 interface Joke {
   joke: string;
   score: number;
   date: string;
 }
 
+const scoreButton = <HTMLButtonElement>document.getElementById("scoreButtons");
+const TARJETA_BROMA = <HTMLElement>document.getElementById('joke');
 const reportJokes: Joke[] = [];
-let jokeResponse: JokeResponse
+const jokeResponse: Joke = { joke: "", score: 0, date: "" };
 
-async function callRandomJoke(): Promise<void> {   
-    const API_URL = 'https://icanhazdadjoke.com/';
-    const options: RequestInit = {headers: {'Accept': 'application/json'}};
-    jokeResponse = await (await fetch(API_URL, options)).json();
-   
-    
-    const scoreButton = document.getElementById("scoreButtons") as HTMLButtonElement;
-    scoreButton.style.display = "block";
-    
-// 2.4 Se obtiene un elemento HTML con el id "joke" y se le asigna el valor del chiste obtenido de la respuesta.
-    const HTMLResponse = document.querySelector('#joke') as HTMLElement;
-    HTMLResponse.innerHTML = jokeResponse.joke;
+if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(function (position) {
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+
+    // Haciendo una solicitud a OpenWeatherMap API para obtener el tiempo
+    fetch(`http://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=26e4714b232ad047024b8f3db887092f`)
+      .then(response => response.json())
+      .then((dataResponse) => {
+        const arrayTiempo = dataResponse.weather
+        const descipcionTiempo = arrayTiempo[0].description
+        console.log(dataResponse)
+        console.log(descipcionTiempo)
+        document.getElementById('weater')!.innerHTML = `Hoy hace: ${descipcionTiempo}`;
+      });
+  })
 }
 
-function getPoints(id: number) {
-  const isDifferentJoke: boolean = jokeResponse.joke !== reportJokes[reportJokes.length -1]?.joke
-  console.log("🚀 ~ file: main.ts:32 ~ getPoints ~ isDifferentJoke", isDifferentJoke)
-    if (isDifferentJoke) {
-      const textDate: string = new Date().toISOString();
-      const joke: Joke = { joke: jokeResponse.joke, score: id, date: textDate };
-      reportJokes.push(joke);
+function callRandomJoke(): void {
+
+  let urlAPI: string;
+
+  switch (Math.round(Math.random())) {
+    case 1: {
+      urlAPI = 'https://api.chucknorris.io/jokes/random';
+      fetch(urlAPI)
+        .then((respuesta) => respuesta.json())
+        .then((contenidoJson) => {
+
+          jokeResponse.joke = contenidoJson.value;
+
+          TARJETA_BROMA.innerHTML = jokeResponse.joke;
+
+          scoreButton.style.display = "block";
+        })
+      console.log(urlAPI)
+      break;
     }
-    console.log("🚀 ~ file: main.ts:38 ~ getPoints ~ reportJokes", reportJokes)
+    default: {
+      urlAPI = 'https://icanhazdadjoke.com/';
+      const header = { headers: { Accept: "application/json" } };
+      fetch(urlAPI, header)
+        .then((respuesta) => respuesta.json())
+        .then((contenidoJson) => {
+
+          jokeResponse.joke = contenidoJson.joke;
+
+          TARJETA_BROMA.innerHTML = jokeResponse.joke;
+
+          scoreButton.style.display = "block";
+        })
+      console.log(urlAPI)
+      break;
+    }
+  }
+}
+
+/*
+function punctuate(idHtml: number) {
+
+  const isDifferentJoke: boolean = !reportJokes.some(e => e.joke === jokeResponse.joke)
+
+  if (isDifferentJoke) {
+   
+    reportJokes.push({ joke: jokeResponse.joke, score: idHtml, date: new Date().toISOString() });
+  }
+
+  scoreButton.style.display = "none";
+
+  console.log(reportJokes)
+}
+*/
+
+function punctuate(idHtml: number) {
+
+  let indice: number = -1;
+
+  reportJokes.some((e, i) => { if (e.joke === jokeResponse.joke) indice = i; return false;})
+
+  if (indice === -1) {
+
+    reportJokes.push({ joke: jokeResponse.joke, score: idHtml, date: new Date().toISOString() });
+
+  } else {
+
+    reportJokes[indice].score = idHtml;
+  }
+
+
+  console.log(reportJokes)
 }
