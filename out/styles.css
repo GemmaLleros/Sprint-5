@@ -1,29 +1,4 @@
 @charset "UTF-8";
-html, body {
-  overflow-x: hidden;
-}
-
-.card-title {
-  color: #fff;
-}
-
-.card {
-  padding-top: 50px;
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-.scoreButtons button {
-  border: none;
-  background-color: transparent;
-  font-size: 2rem;
-}
-
-.scoreButtons button:hover {
-  background-color: unset;
-  color: unset;
-  cursor: default;
-}
-
 /*!
  * Bootstrap  v5.3.0-alpha1 (https://getbootstrap.com/)
  * Copyright 2011-2022 The Bootstrap Authors

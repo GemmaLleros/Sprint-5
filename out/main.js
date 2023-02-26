@@ -1,21 +1,29 @@
 "use strict";
 const scoreButton = document.getElementById("scoreButtons");
-const TARJETA_BROMA = document.getElementById('joke');
+const JOKE_CARD = document.getElementById('joke');
 const reportJokes = [];
 const jokeResponse = { joke: "", score: 0, date: "" };
 if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function (position) {
         const latitude = position.coords.latitude;
         const longitude = position.coords.longitude;
+        const apiWeather = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=26e4714b232ad047024b8f3db887092f&lang=ca&units=metric`;
+        console.log(apiWeather);
         // Haciendo una solicitud a OpenWeatherMap API para obtener el tiempo
-        fetch(`http://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=26e4714b232ad047024b8f3db887092f`)
+        fetch(apiWeather)
             .then(response => response.json())
             .then((dataResponse) => {
-            const arrayTiempo = dataResponse.weather;
-            const descipcionTiempo = arrayTiempo[0].description;
+            const arrayWeather = dataResponse.weather;
+            const tempCent = dataResponse.main.temp;
+            const icon = (arrayWeather[0]).icon;
+            const iconWeather = document.getElementById('iconWeather');
+            iconWeather.src = `./images/icons-temp/${icon}.png`;
+            const weatherDescription = arrayWeather[0].description;
             console.log(dataResponse);
-            console.log(descipcionTiempo);
-            document.getElementById('weater').innerHTML = `Hoy hace: ${descipcionTiempo}`;
+            console.log(weatherDescription);
+            console.log(dataResponse.main.temp);
+            console.log(arrayWeather);
+            document.getElementById('weather').innerHTML = `Hoy hace: ${tempCent}\u00B0`;
         });
     });
 }
@@ -28,7 +36,7 @@ function callRandomJoke() {
                 .then((respuesta) => respuesta.json())
                 .then((contenidoJson) => {
                 jokeResponse.joke = contenidoJson.value;
-                TARJETA_BROMA.innerHTML = jokeResponse.joke;
+                JOKE_CARD.innerHTML = jokeResponse.joke;
                 scoreButton.style.display = "block";
             });
             console.log(urlAPI);
@@ -41,7 +49,7 @@ function callRandomJoke() {
                 .then((respuesta) => respuesta.json())
                 .then((contenidoJson) => {
                 jokeResponse.joke = contenidoJson.joke;
-                TARJETA_BROMA.innerHTML = jokeResponse.joke;
+                JOKE_CARD.innerHTML = jokeResponse.joke;
                 scoreButton.style.display = "block";
             });
             console.log(urlAPI);
@@ -49,30 +57,32 @@ function callRandomJoke() {
         }
     }
 }
+function punctuate(idHtml) {
+    const isDifferentJoke = !reportJokes.some(e => e.joke === jokeResponse.joke);
+    if (isDifferentJoke) {
+        reportJokes.push({ joke: jokeResponse.joke, score: idHtml, date: new Date().toISOString() });
+    }
+    scoreButton.style.display = "none";
+    console.log(reportJokes);
+}
 /*
+Opción para cambiar puntuación:
 function punctuate(idHtml: number) {
 
-  const isDifferentJoke: boolean = !reportJokes.some(e => e.joke === jokeResponse.joke)
+  let indice: number = -1;
 
-  if (isDifferentJoke) {
-   
+  reportJokes.some((e, i) => { if (e.joke === jokeResponse.joke) indice = i; return false;})
+
+  if (indice === -1) {
+
     reportJokes.push({ joke: jokeResponse.joke, score: idHtml, date: new Date().toISOString() });
+
+  } else {
+
+    reportJokes[indice].score = idHtml;
   }
 
-  scoreButton.style.display = "none";
 
   console.log(reportJokes)
 }
-*/
-function punctuate(idHtml) {
-    let indice = -1;
-    reportJokes.some((e, i) => { if (e.joke === jokeResponse.joke)
-        indice = i; return false; });
-    if (indice === -1) {
-        reportJokes.push({ joke: jokeResponse.joke, score: idHtml, date: new Date().toISOString() });
-    }
-    else {
-        reportJokes[indice].score = idHtml;
-    }
-    console.log(reportJokes);
-}
+*/ 
